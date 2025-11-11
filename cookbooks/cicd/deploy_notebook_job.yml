@@ -1,0 +1,60 @@
+# This is a sample GitHub Actions workflow for deploying a Databricks notebook job.
+# For a full explanation, see the CI/CD with GitHub Actions cookbook.
+
+name: Deploy Databricks Notebook Job
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'cookbooks/streaming_etl/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.8'
+
+      - name: Install Databricks CLI
+        run: |
+          pip install databricks-cli
+
+      - name: Configure Databricks CLI
+        run: |
+          echo "[DEFAULT]" > ~/.databrickscfg
+          echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
+          echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
+
+      - name: Deploy Notebook
+        run: |
+          databricks workspace import \
+            --language PYTHON \
+            --format SOURCE \
+            --overwrite \
+            cookbooks/streaming_etl/01_streaming_etl_with_dlt.py \
+            /Shared/Cookbooks/01_streaming_etl_with_dlt.py
+
+      - name: Create or Update Databricks Job
+        run: |
+          databricks jobs create --json '{ 
+            "name": "Cookbook: Streaming ETL",
+            "notebook_task": {
+              "notebook_path": "/Shared/Cookbooks/01_streaming_etl_with_dlt.py"
+            },
+            "schedule": {
+              "quartz_cron_expression": "0 0 8 * * ?",
+              "timezone_id": "UTC"
+            },
+            "new_cluster": {
+              "spark_version": "13.3.x-scala2.12",
+              "node_type_id": "i3.xlarge",
+              "num_workers": 2
+            }
+          }'

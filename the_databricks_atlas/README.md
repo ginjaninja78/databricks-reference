@@ -25,6 +25,7 @@ Every link in this atlas has been hand-picked and vetted to ensure it is high-qu
 ### Tools & Ecosystem
 
 - [**Tools & Utilities**](04_tools_and_utilities.md): A curated list of essential tools and utilities that enhance the Databricks experience.
+- [**Solution Accelerators**](06_solution_accelerators.md): Production-ready blueprints from Databricks for common use cases.
 
 ---
 
