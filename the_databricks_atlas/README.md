@@ -21,6 +21,7 @@ Every link in this atlas has been hand-picked and vetted to ensure it is high-qu
 
 - [**Community & Blogs**](03_community_and_blogs.md): The best blogs, forums, and community hubs to stay up-to-date and get your questions answered.
 - [**Video Content**](05_video_content.md): The most valuable YouTube channels, conference talks, and webinars.
+- [**Books & Publications**](07_books_and_publications.md): The definitive reading list for mastering the data lakehouse.
 
 ### Tools & Ecosystem
 
