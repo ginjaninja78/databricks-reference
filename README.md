@@ -26,13 +26,14 @@ This is not a quick-start guide. This is an **exhaustive library** with deep exp
 
 ## 🤖 Meet "The LibrAIrian" - Your AI-Powered Guide
 
-This repository features **"The LibrAIrian"**, an innovative AI-assisted navigation system designed to work with **GitHub Copilot** in VS Code.
+This repository features **"The LibrAIrian"**, an innovative AI-assisted navigation system designed to work with **GitHub Copilot** in VS Code, plus an advanced **Fork Management System** for seamless collaboration.
 
 The LibrAIrian helps you:
 - **Navigate** this massive repository intelligently
 - **Find** exactly the code examples, notebooks, or documentation you need
 - **Generate** Databricks-specific code following this project's conventions
 - **Learn** interactively by asking questions grounded in the repository's content
+- **Contribute** with automated guidance, quality checks, and fork synchronization
 
 ### How to Use The LibrAIrian
 
@@ -52,7 +53,21 @@ The LibrAIrian helps you:
 @workspace #file:.librAIrian/code_conventions.md Generate a PySpark script to read a CSV file and write it to a Delta table, following the project's coding standards.
 ```
 
-**Learn more:** [The LibrAIrian Documentation](.librAIrian/README.md)
+**Learn more:** [The LibrAIrian Documentation](pillar_iii/the_librairian/README.md)
+
+### Fork Management System
+
+The LibrAIrian also includes an **automated fork management system** that helps contributors working through their forks:
+
+- 🤖 **Automated Welcome** - Greets new contributors with guidance and checklists
+- 🏷️ **Smart Labeling** - Automatically categorizes contributions by pillar and type
+- ✅ **Quality Checks** - Runs automated validation for code, docs, and structure
+- 🔄 **Sync Reminders** - Helps keep your fork updated with upstream changes
+- 💡 **Contextual Guidance** - Provides suggestions based on your contribution
+
+When you open a pull request from your fork, the LibrAIrian automatically analyzes your contribution, provides helpful feedback, and guides you through the process. All automation operates securely within your PR—your fork remains under your complete control.
+
+**Learn more:** [Fork Management System](pillar_iii/the_librairian/fork_management.md)
 
 ---
 

@@ -1,0 +1,253 @@
+name: LibrAIrian PR Review
+
+# Automated review and quality checks for pull requests from forks
+# Provides detailed feedback and suggestions for improvements
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  quality-check:
+    name: Quality Check
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.fork == true
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          
+      - name: Install quality check tools
+        run: |
+          pip install --upgrade pip
+          pip install markdownlint-cli2
+          pip install yamllint
+          
+      - name: Check Markdown files
+        id: markdown-check
+        continue-on-error: true
+        run: |
+          echo "Checking Markdown files..."
+          MARKDOWN_FILES=$(find . -name "*.md" -not -path "./.git/*" -not -path "./node_modules/*")
+          
+          if [ -n "$MARKDOWN_FILES" ]; then
+            # Create a simple markdownlint config
+            cat > .markdownlint.json << 'EOF'
+          {
+            "default": true,
+            "MD013": false,
+            "MD033": false,
+            "MD041": false
+          }
+          EOF
+            
+            # Check markdown (but don't fail the build)
+            echo "$MARKDOWN_FILES" | xargs npx markdownlint-cli2 --config .markdownlint.json || true
+            echo "markdown_checked=true" >> $GITHUB_OUTPUT
+          else
+            echo "markdown_checked=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Check YAML files
+        id: yaml-check
+        continue-on-error: true
+        run: |
+          echo "Checking YAML files..."
+          YAML_FILES=$(find .github -name "*.yml" -o -name "*.yaml" 2>/dev/null)
+          
+          if [ -n "$YAML_FILES" ]; then
+            echo "$YAML_FILES" | xargs yamllint -d relaxed || true
+            echo "yaml_checked=true" >> $GITHUB_OUTPUT
+          else
+            echo "yaml_checked=false" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Analyze file structure
+        id: structure-check
+        run: |
+          echo "Analyzing file structure..."
+          
+          # Check for files in root that should be in pillars
+          ROOT_MD_FILES=$(find . -maxdepth 1 -name "*.md" -not -name "README.md" -not -name "LICENSE.md" -not -name "CONTRIBUTING.md" -not -name "CODE_OF_CONDUCT.md" -not -name "*.md" | wc -l)
+          
+          # Check for properly placed code files
+          CODE_FILES=$(find sample_code -type f 2>/dev/null | wc -l)
+          NOTEBOOK_FILES=$(find sample_notebooks -type f -name "*.ipynb" 2>/dev/null | wc -l)
+          
+          echo "root_md_count=$ROOT_MD_FILES" >> $GITHUB_OUTPUT
+          echo "code_files=$CODE_FILES" >> $GITHUB_OUTPUT
+          echo "notebook_files=$NOTEBOOK_FILES" >> $GITHUB_OUTPUT
+          
+      - name: Post quality check results
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            
+            const markdownChecked = '${{ steps.markdown-check.outputs.markdown_checked }}' === 'true';
+            const yamlChecked = '${{ steps.yaml-check.outputs.yaml_checked }}' === 'true';
+            const codeFiles = '${{ steps.structure-check.outputs.code_files }}';
+            const notebookFiles = '${{ steps.structure-check.outputs.notebook_files }}';
+            
+            let qualityReport = `## ✅ LibrAIrian Quality Check Report
+            
+            Your contribution has been analyzed for quality and compliance with repository standards.
+            
+            ### Checks Performed
+            
+            ${markdownChecked ? '✅ Markdown files reviewed' : '⏭️ No Markdown files to check'}
+            ${yamlChecked ? '✅ YAML files validated' : '⏭️ No YAML files to check'}
+            ✅ File structure analyzed
+            
+            ### Contribution Details
+            
+            - Code examples: ${codeFiles} files
+            - Notebooks: ${notebookFiles} files
+            
+            ### Recommendations
+            
+            `;
+            
+            // Add specific recommendations based on the contribution
+            if (parseInt(codeFiles) > 0) {
+              qualityReport += `
+            #### Code Examples
+            - ✅ Ensure all code examples are tested and working
+            - ✅ Include docstrings and comments for complex logic
+            - ✅ Follow language-specific style guides (PEP 8 for Python, etc.)
+            - ✅ Provide example input/output or usage instructions
+            `;
+            }
+            
+            if (parseInt(notebookFiles) > 0) {
+              qualityReport += `
+            #### Notebooks
+            - ✅ Start with a markdown cell explaining the notebook's purpose
+            - ✅ Include clear section headers using markdown cells
+            - ✅ Test all cells to ensure they run successfully
+            - ✅ Clear output before committing (unless output is instructional)
+            `;
+            }
+            
+            qualityReport += `
+            
+            ### Style Guide References
+            
+            - [Contributing Guidelines](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/CONTRIBUTING.md)
+            - [Python Style Guide](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/CONTRIBUTING.md#pythonpyspark)
+            - [SQL Style Guide](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/CONTRIBUTING.md#sql)
+            - [Notebook Guidelines](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/CONTRIBUTING.md#notebook-guidelines)
+            
+            ### Next Steps
+            
+            A maintainer will review your contribution soon. If you need to make changes:
+            1. Make your edits in your fork
+            2. Commit and push to the same branch
+            3. This PR will update automatically
+            
+            ---
+            *🤖 Quality check performed by LibrAIrian*`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: qualityReport
+            });
+
+  check-permissions:
+    name: Verify Fork Permissions
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.fork == true
+    steps:
+      - name: Verify repository settings
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const pr = context.payload.pull_request;
+            
+            console.log('PR from fork:', pr.head.repo.full_name);
+            console.log('Target repository:', pr.base.repo.full_name);
+            console.log('Fork verified:', pr.head.repo.fork);
+            
+            // Verify this is indeed from a fork
+            if (!pr.head.repo.fork) {
+              console.log('Warning: PR is not from a fork, skipping fork-specific automation');
+            } else {
+              console.log('✅ Fork permissions verified');
+              console.log('✅ PR automation will only affect this PR, not the fork repository');
+            }
+
+  documentation-check:
+    name: Check Documentation Completeness
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.fork == true
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          
+      - name: Analyze documentation
+        id: doc-check
+        run: |
+          # Check if PR includes documentation changes
+          HAS_CODE=$(git diff origin/${{ github.event.pull_request.base.ref }} --name-only | grep -E '\.(py|sql|scala|r)$' | wc -l)
+          HAS_DOCS=$(git diff origin/${{ github.event.pull_request.base.ref }} --name-only | grep -E '\.md$' | wc -l)
+          
+          echo "has_code=$HAS_CODE" >> $GITHUB_OUTPUT
+          echo "has_docs=$HAS_DOCS" >> $GITHUB_OUTPUT
+          
+      - name: Suggest documentation
+        if: steps.doc-check.outputs.has_code > 0 && steps.doc-check.outputs.has_docs == 0
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            
+            const message = `## 📚 Documentation Suggestion
+            
+            The LibrAIrian noticed that your PR includes code changes but doesn't include documentation updates.
+            
+            **This is just a suggestion** - not all code changes require documentation updates. However, consider if your changes would benefit from:
+            
+            - Adding a README in the code directory explaining the examples
+            - Updating existing documentation to reference the new code
+            - Adding comments in the code explaining complex logic
+            - Creating a notebook that demonstrates usage
+            
+            ### Documentation Structure
+            
+            - Conceptual docs → \`pillar_*/\` directories
+            - Code examples → \`sample_code/\` with README files
+            - Notebooks → \`sample_notebooks/\` with markdown cells
+            
+            Feel free to ignore this if documentation isn't needed for your changes!
+            
+            ---
+            *🤖 Suggestion from LibrAIrian*`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: message
+            });

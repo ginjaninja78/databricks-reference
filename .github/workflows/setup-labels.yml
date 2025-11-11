@@ -1,0 +1,117 @@
+name: Setup LibrAIrian Labels
+
+# This workflow creates the labels needed for the LibrAIrian fork management system
+# Run manually when setting up the repository or when label configuration changes
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/librairian-config.yml'
+      - '.github/workflows/setup-labels.yml'
+    branches:
+      - main
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  create-labels:
+    name: Create or Update Labels
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        
+      - name: Create/Update Pillar Labels
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const labels = [
+              {
+                name: 'pillar-i-core-concepts',
+                color: '0E8A16',
+                description: 'Related to Pillar I: Core Concepts'
+              },
+              {
+                name: 'pillar-ii-developer-toolkit',
+                color: '1D76DB',
+                description: 'Related to Pillar II: Developer\'s Toolkit'
+              },
+              {
+                name: 'pillar-iii-mlops-devops',
+                color: '5319E7',
+                description: 'Related to Pillar III: MLOps & DevOps'
+              },
+              {
+                name: 'pillar-iv-enterprise',
+                color: 'D93F0B',
+                description: 'Related to Pillar IV: Enterprise Readiness'
+              },
+              {
+                name: 'code-example',
+                color: 'BFD4F2',
+                description: 'Code example contribution'
+              },
+              {
+                name: 'notebook',
+                color: 'C5DEF5',
+                description: 'Notebook contribution'
+              },
+              {
+                name: 'documentation',
+                color: 'D4C5F9',
+                description: 'Documentation contribution'
+              },
+              {
+                name: 'configuration',
+                color: 'E99695',
+                description: 'Configuration file changes'
+              },
+              {
+                name: 'fork-contribution',
+                color: 'FBCA04',
+                description: 'Contribution from a fork'
+              },
+              {
+                name: 'fork-help',
+                color: 'FEF2C0',
+                description: 'Help or guidance for fork users'
+              }
+            ];
+            
+            for (const label of labels) {
+              try {
+                // Try to create the label
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: label.name,
+                  color: label.color,
+                  description: label.description
+                });
+                console.log(`✅ Created label: ${label.name}`);
+              } catch (error) {
+                if (error.status === 422) {
+                  // Label already exists, update it
+                  try {
+                    await github.rest.issues.updateLabel({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      name: label.name,
+                      color: label.color,
+                      description: label.description
+                    });
+                    console.log(`🔄 Updated label: ${label.name}`);
+                  } catch (updateError) {
+                    console.error(`❌ Failed to update label ${label.name}:`, updateError.message);
+                  }
+                } else {
+                  console.error(`❌ Failed to create label ${label.name}:`, error.message);
+                }
+              }
+            }
+            
+            console.log('\n✅ Label setup complete!');

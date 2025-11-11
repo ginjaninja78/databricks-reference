@@ -27,4 +27,32 @@ This map includes:
 
 When you ask Copilot a question with this file open, it uses this map to find the most relevant information within the repository and provide a precise, context-aware answer.
 
+## The LibrAIrian Fork Management System
+
+In addition to being an AI-powered guide, **The LibrAIrian now includes an advanced Fork Management System** that automates and streamlines the contribution process for users working through their forks.
+
+### Key Features
+
+- **🤖 Automated Welcome**: Greets fork contributors with helpful onboarding information
+- **🏷️ Smart Labeling**: Automatically categorizes PRs by pillar and contribution type
+- **✅ Quality Checks**: Runs automated checks for code quality, documentation, and structure
+- **🔄 Sync Reminders**: Helps keep your fork up-to-date with upstream changes
+- **💡 Contextual Guidance**: Provides suggestions and best practices throughout the contribution process
+- **🔒 Secure Operations**: All automation respects permissions and only operates within approved boundaries
+
+### How It Helps You
+
+When you contribute from your fork, the LibrAIrian automatically:
+
+1. **Welcomes you** with a friendly message and contribution checklist
+2. **Analyzes your changes** to identify affected areas and contribution type
+3. **Runs quality checks** to ensure consistency with repository standards
+4. **Provides guidance** with links to relevant documentation and style guides
+5. **Reminds you** when your fork needs syncing with upstream changes
+6. **Respects your repository** by never modifying your fork directly
+
+[Learn more about the Fork Management System →](fork_management.md)
+
+## Getting Started
+
 This section will guide you on how to set up and use The LibrAIrian to make your learning journey faster, more interactive, and more effective.
