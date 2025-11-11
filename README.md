@@ -106,15 +106,15 @@ This repository is published as a **GitHub Pages site** for easy navigation and 
 
 ---
 
-## 🧪 Sample Code & Notebooks
+## 🍳 Cookbooks & Code Recipes
 
 This repository includes hundreds of ready-to-use examples:
 
-- **Sample Notebooks**: [`sample_notebooks/`](sample_notebooks/) - Jupyter/Databricks notebooks for Bronze, Silver, Gold layers and advanced scenarios
-- **Python Code**: [`sample_code/python/`](sample_code/python/) - Standalone Python scripts and modules
-- **R Code**: [`sample_code/r/`](sample_code/r/) - SparkR and sparklyr examples
-- **Scala Code**: [`sample_code/scala/`](sample_code/scala/) - High-performance Scala examples
-- **SQL Scripts**: [`sample_code/sql/`](sample_code/sql/) - Databricks SQL queries and migration patterns
+- **Cookbooks**: [`cookbooks/`](cookbooks/) - End-to-end recipes for common Databricks patterns
+- **Code Recipes**: [`code_recipes/`](code_recipes/) - Reusable code snippets and utilities and scripts in Python, SQL, and R
+- **R Code**: [`code_recipes/r/`](code_recipes/r/) - SparkR and sparklyr examples
+- **Scala Code**: [`code_recipes/scala/`](code_recipes/scala/) - High-performance Scala examples
+- **SQL Scripts**: [`code_recipes/sql/`](code_recipes/sql/) - Databricks SQL queries and migration patterns
 
 ---
 
