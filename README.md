@@ -6,6 +6,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
+**📖 [Quick Reference Cheat Sheet](QUICK_REFERENCE.md)** • **🎨 [Visual Banner](BANNER.md)** • **🤖 [Meet The LibrAIrian](.github/LibrAIrian.agent.md)**
+
 ---
 
 ## 🎯 Purpose
