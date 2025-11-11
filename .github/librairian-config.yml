@@ -5,24 +5,24 @@
 librairian:
   enabled: true
   version: "1.0.0"
-  
+
 # Fork Management Settings
 fork_management:
   # Automatically welcome new fork contributors
   auto_welcome: true
-  
+
   # Automatically label PRs from forks
   auto_label: true
-  
+
   # Provide automated guidance and suggestions
   auto_guidance: true
-  
+
   # Send sync reminders for forks that are behind
   sync_reminders:
     enabled: true
     threshold_commits: 5  # Remind if fork is behind by this many commits
     frequency_days: 7     # How often to check (weekly by default)
-  
+
   # Quality checks
   quality_checks:
     markdown_lint: true
@@ -45,7 +45,7 @@ labels:
     - name: "pillar-iv-enterprise"
       color: "D93F0B"
       description: "Related to Pillar IV: Enterprise Readiness"
-  
+
   types:
     - name: "code-example"
       color: "BFD4F2"
@@ -72,11 +72,11 @@ response_templates:
     enabled: true
     include_checklist: true
     include_resources: true
-    
+
   quality_report:
     enabled: true
     include_recommendations: true
-    
+
   sync_reminder:
     enabled: true
     threshold: 5
@@ -85,10 +85,10 @@ response_templates:
 permissions:
   # Only operate on forks (safety check)
   require_fork: true
-  
+
   # Don't modify fork repositories directly
   no_fork_writes: true
-  
+
   # Only comment on PRs and issues in main repository
   main_repo_only: true
 
@@ -104,7 +104,7 @@ notifications:
     - "on_new_fork_pr"
     - "on_significant_contribution"
     - "on_quality_issues"
-  
+
   contributors:
     - "on_welcome"
     - "on_quality_check"

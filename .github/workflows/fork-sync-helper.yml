@@ -38,7 +38,7 @@ jobs:
             // Find open PRs from forks in the last 30 days
             const thirtyDaysAgo = new Date();
             thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-            
+
             const { data: pullRequests } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -46,15 +46,15 @@ jobs:
               sort: 'updated',
               direction: 'desc'
             });
-            
-            const activeForkPRs = pullRequests.filter(pr => 
-              pr.head.repo && 
-              pr.head.repo.fork && 
+
+            const activeForkPRs = pullRequests.filter(pr =>
+              pr.head.repo &&
+              pr.head.repo.fork &&
               new Date(pr.updated_at) > thirtyDaysAgo
             );
-            
+
             console.log(`Found ${activeForkPRs.length} active fork PRs`);
-            
+
             // Post helpful sync reminders on active PRs
             for (const pr of activeForkPRs.slice(0, 10)) { // Limit to 10 to avoid rate limits
               const { data: commits } = await github.rest.repos.compareCommits({
@@ -63,36 +63,36 @@ jobs:
                 base: pr.head.sha,
                 head: pr.base.ref
               });
-              
+
               if (commits.ahead_by > 5) {
                 const message = `## 🔄 Fork Sync Reminder
-                
+
                 Hi @${pr.user.login}! The LibrAIrian noticed that the upstream repository has moved ahead by **${commits.ahead_by} commits** since your last update.
-                
+
                 ### How to sync your fork:
-                
+
                 1. **Using GitHub Web UI:**
                    - Go to your fork: ${pr.head.repo.html_url}
                    - Click "Sync fork" button
                    - Click "Update branch"
-                
+
                 2. **Using Git CLI:**
                    \`\`\`bash
                    # Add upstream remote (one time setup)
                    git remote add upstream https://github.com/${context.repo.owner}/${context.repo.repo}.git
-                   
+
                    # Fetch and merge upstream changes
                    git fetch upstream
                    git checkout ${pr.head.ref}
                    git merge upstream/${pr.base.ref}
                    git push origin ${pr.head.ref}
                    \`\`\`
-                
+
                 Keeping your fork synchronized helps avoid merge conflicts and ensures you're working with the latest code!
-                
+
                 ---
                 *🤖 Automated sync reminder by LibrAIrian*`;
-                
+
                 await github.rest.issues.createComment({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
@@ -114,80 +114,80 @@ jobs:
           script: |
             const forkOwner = '${{ inputs.fork_owner }}';
             const syncBranch = '${{ inputs.sync_branch }}';
-            
+
             const guidanceMessage = `## 🔄 Fork Synchronization Guide for @${forkOwner}
-            
+
             This guide will help you keep your fork of the Databricks Reference Library in sync with the upstream repository.
-            
+
             ### Method 1: GitHub Web Interface (Easiest)
-            
+
             1. Navigate to your fork: https://github.com/${forkOwner}/${context.repo.repo}
             2. Look for the message indicating your fork is behind the upstream
             3. Click the **"Sync fork"** button
             4. Click **"Update branch"** to sync
-            
+
             ### Method 2: Git Command Line
-            
+
             \`\`\`bash
             # Clone your fork (if not already done)
             git clone https://github.com/${forkOwner}/${context.repo.repo}.git
             cd ${context.repo.repo}
-            
+
             # Add upstream remote (one-time setup)
             git remote add upstream https://github.com/${context.repo.owner}/${context.repo.repo}.git
-            
+
             # Fetch upstream changes
             git fetch upstream
-            
+
             # Switch to your target branch
             git checkout ${syncBranch}
-            
+
             # Merge upstream changes
             git merge upstream/${syncBranch}
-            
+
             # Push to your fork
             git push origin ${syncBranch}
             \`\`\`
-            
+
             ### Method 3: GitHub CLI
-            
+
             \`\`\`bash
             # Sync fork using GitHub CLI
             gh repo sync ${forkOwner}/${context.repo.repo} -b ${syncBranch}
             \`\`\`
-            
+
             ### Keeping Your Feature Branches Updated
-            
+
             If you have feature branches with ongoing work:
-            
+
             \`\`\`bash
             # Switch to your feature branch
             git checkout your-feature-branch
-            
+
             # Rebase on top of updated main branch
             git rebase ${syncBranch}
-            
+
             # Force push (only if branch is not shared)
             git push --force-with-lease origin your-feature-branch
             \`\`\`
-            
+
             ### Best Practices
-            
+
             - ✅ Sync your fork regularly (weekly recommended)
             - ✅ Sync before starting new work
             - ✅ Sync before creating pull requests
             - ✅ Resolve conflicts promptly
-            
+
             ### Need Help?
-            
+
             If you encounter issues:
             1. Check our [Contributing Guide](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/CONTRIBUTING.md)
             2. Search existing issues for similar problems
             3. Open a new issue with details about your sync problem
-            
+
             ---
             *🤖 Generated by LibrAIrian Fork Sync Helper*`;
-            
+
             const { data: issue } = await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -195,5 +195,5 @@ jobs:
               body: guidanceMessage,
               labels: ['fork-help', 'documentation']
             });
-            
+
             console.log(`Created guidance issue: ${issue.html_url}`);
