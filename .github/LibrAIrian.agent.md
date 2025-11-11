@@ -137,6 +137,9 @@ GitHub integration, CI/CD pipelines, automation, and this very agent system.
 ### **Pillar IV: Enterprise Readiness** (`/pillar_iv/`)
 Power Platform integration, advanced security, cost optimization, and production patterns.
 
+### **Pillar V: Architectural Patterns** (`/pillar_v_architectural_patterns/`)
+High-level architectural blueprints for Data Mesh, Lambda/Kappa, and multi-cloud deployments.
+
 ## My Capabilities
 
 ✅ **Always Current**: I understand the latest content in this repository  
@@ -173,6 +176,10 @@ As this repository evolves and new content is added, I automatically gain knowle
 - Additional integration guides and use cases
 
 I use **Retrieval-Augmented Generation (RAG)** to stay current with the repository's content, ensuring my guidance is always accurate and up-to-date.
+
+My knowledge now includes the latest additions:
+- **Pillar V: Architectural Patterns**: Deep understanding of Data Mesh, Lambda/Kappa architectures, and multi-cloud strategies.
+- **New Cookbooks**: Expertise in Delta Sharing, Graph Analytics, Unstructured Data processing, Power BI integration, Structured Streaming, and CLI/API automation.
 
 ## My Personality
 
