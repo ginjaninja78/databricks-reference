@@ -1,0 +1,112 @@
+# LibrAIrian Agent Configuration
+# This file controls the behavior of the LibrAIrian fork management system
+
+# General Settings
+librairian:
+  enabled: true
+  version: "1.0.0"
+
+# Fork Management Settings
+fork_management:
+  # Automatically welcome new fork contributors
+  auto_welcome: true
+
+  # Automatically label PRs from forks
+  auto_label: true
+
+  # Provide automated guidance and suggestions
+  auto_guidance: true
+
+  # Send sync reminders for forks that are behind
+  sync_reminders:
+    enabled: true
+    threshold_commits: 5  # Remind if fork is behind by this many commits
+    frequency_days: 7     # How often to check (weekly by default)
+
+  # Quality checks
+  quality_checks:
+    markdown_lint: true
+    yaml_lint: true
+    structure_check: true
+    documentation_check: true
+
+# Labeling Configuration
+labels:
+  pillars:
+    - name: "pillar-i-core-concepts"
+      color: "0E8A16"
+      description: "Related to Pillar I: Core Concepts"
+    - name: "pillar-ii-developer-toolkit"
+      color: "1D76DB"
+      description: "Related to Pillar II: Developer's Toolkit"
+    - name: "pillar-iii-mlops-devops"
+      color: "5319E7"
+      description: "Related to Pillar III: MLOps & DevOps"
+    - name: "pillar-iv-enterprise"
+      color: "D93F0B"
+      description: "Related to Pillar IV: Enterprise Readiness"
+
+  types:
+    - name: "code-example"
+      color: "BFD4F2"
+      description: "Code example contribution"
+    - name: "notebook"
+      color: "C5DEF5"
+      description: "Notebook contribution"
+    - name: "documentation"
+      color: "D4C5F9"
+      description: "Documentation contribution"
+    - name: "configuration"
+      color: "E99695"
+      description: "Configuration file changes"
+    - name: "fork-contribution"
+      color: "FBCA04"
+      description: "Contribution from a fork"
+    - name: "fork-help"
+      color: "FEF2C0"
+      description: "Help or guidance for fork users"
+
+# Response Templates
+response_templates:
+  welcome_message:
+    enabled: true
+    include_checklist: true
+    include_resources: true
+
+  quality_report:
+    enabled: true
+    include_recommendations: true
+
+  sync_reminder:
+    enabled: true
+    threshold: 5
+
+# Permissions and Security
+permissions:
+  # Only operate on forks (safety check)
+  require_fork: true
+
+  # Don't modify fork repositories directly
+  no_fork_writes: true
+
+  # Only comment on PRs and issues in main repository
+  main_repo_only: true
+
+# Automation Limits (to prevent spam)
+rate_limits:
+  max_comments_per_pr: 5
+  max_labels_per_pr: 6
+  min_time_between_comments: 300  # seconds (5 minutes)
+
+# Notification Settings
+notifications:
+  maintainers:
+    - "on_new_fork_pr"
+    - "on_significant_contribution"
+    - "on_quality_issues"
+
+  contributors:
+    - "on_welcome"
+    - "on_quality_check"
+    - "on_sync_needed"
+    - "on_guidance"
